@@ -1,0 +1,287 @@
+Programming challenge description:
+Write a program implementing a priority queue.
+
+Each element is a pair containing a value and an associated priority. Elements are processed in the queue according to their priority. The value and priority are both integers.
+
+The priority queue should have enqueue and dequeue methods:
+
+The enqueue method must insert a given element into the queue
+The dequeue method must remove the element with the highest priority first. If elements have the same priority, they must be removed in the order in which they were inserted.
+The queue must also have a certain capacity, which is the maximum number of elements allowed in the data structure.
+
+If the queue is full and contains at least one element with a priority less than the priority of an element to be inserted, the enqueue method must insert the new element by replacing the existing element with the lowest priority in the queue. If the queue is full but doesn't contain elements with the lower priority, the enqueue method must do nothing. Similarly, the dequeue method must do nothing if the queue is empty.
+
+You will be asked to perform a sequence of operations and then print the state of the queue after processing all operations.
+
+Input:
+The first line of input contains a positive integer which sets the capacity of the queue.
+
+Each additional line contains the string name of an operation to be performed: enqueue or dequeue.
+
+The enqueue string will be followed by two integers: a value and a priority of the element to be inserted into the queue.
+
+For example:
+
+3
+enqueue 5 3
+enqueue 6 5
+enqueue 1 -1
+dequeue
+enqueue -2 0
+dequeue
+enqueue 3 1
+enqueue 4 2
+Output:
+Print the value and priority of each element the queue will contain after all operations have been applied, separated by a space.
+
+Each element must be printed on a separate line. The order of the elements must be in descending order of their priorities. For example:
+
+4 2
+3 1
+-2 0
+Print Empty if the queue will be empty after all operations.
+
+Test 1
+Test Input
+Download Test 1 Input
+3
+enqueue 5 3
+enqueue 6 5
+enqueue 1 -1
+dequeue
+enqueue -2 0
+dequeue
+enqueue 3 1
+enqueue 4 2
+Expected Output
+Download Test 1 Output
+4 2
+3 1
+-2 0
+Test 2
+Test Input
+Download Test 2 Input
+3
+dequeue
+enqueue 91 4
+enqueue 30 8
+Expected Output
+Download Test 2 Output
+30 8
+91 4
+Test 3
+Test Input
+Download Test 3 Input
+10
+enqueue -57 -5
+dequeue
+dequeue
+enqueue -51 5
+dequeue
+dequeue
+dequeue
+enqueue -43 1
+enqueue 13 2
+enqueue -93 3
+dequeue
+enqueue 71 3
+enqueue -46 3
+enqueue 40 4
+dequeue
+Expected Output
+Download Test 3 Output
+71 3
+-46 3
+13 2
+-43 1
+Test 4
+Test Input
+Download Test 4 Input
+3
+enqueue 7 -3
+enqueue 15 6
+enqueue -2 -9
+enqueue -11 4
+enqueue -13 0
+dequeue
+dequeue
+enqueue 0 1
+enqueue 15 -7
+enqueue 19 1
+enqueue 12 -6
+Expected Output
+Download Test 4 Output
+0 1
+19 1
+-13 0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+package com.example.demo;
+
+import org.apache.logging.log4j.util.PropertySource;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+
+import java.util.*;
+
+/**
+ * The Main class implements an application that reads lines from the standard input
+ * and prints them to the standard output.
+ */
+public class Main {
+
+    /**
+     * Iterate through each line of input.
+     */
+
+    public static void main(String[] args) throws IOException {
+        InputStreamReader reader = new InputStreamReader(System.in, StandardCharsets.UTF_8);
+        BufferedReader in = new BufferedReader(reader);
+        String line;
+
+        List<String> listOfStrings = new ArrayList<String>();  /// ArrayList to store Strings while processing file
+        while ((line = in.readLine()) != null) {
+            listOfStrings.add(line);
+        }
+        reader.close();
+
+        // get array elements in a class we can work with
+        int queueCapacity = 0;   /// first element is always capacity of queue
+        List<MyQueueItem> startQueue = new ArrayList<>();
+        for (String str: listOfStrings ){
+            if (queueCapacity == 0) {
+                queueCapacity = Integer.parseInt(str);
+            }
+            else {
+                List<String> inputQueueRow = new ArrayList<String>(Arrays.asList(str.split(" ")));
+                MyQueueItem myQueueItem = new MyQueueItem();
+
+                myQueueItem.setMethod(inputQueueRow.get(0));
+                if (inputQueueRow.size() > 1) {
+                    myQueueItem.setValue(Integer.parseInt(inputQueueRow.get(1)));
+                    myQueueItem.setPriority(Integer.parseInt(inputQueueRow.get(2)));
+                }
+
+                startQueue.add(myQueueItem);
+            }
+        }
+
+        // loop through array and create prioritized queue and process
+        MyPriorityQueue<MyQueueItem> finalQueue = new MyPriorityQueue<>(queueCapacity, new QueueComparator());
+        for (MyQueueItem currentElement: startQueue) {
+            if ("enqueue".equalsIgnoreCase(currentElement.getMethod())) {
+                finalQueue.add(currentElement);
+            }
+            else if ("dequeue".equalsIgnoreCase(currentElement.getMethod())) {
+                finalQueue.remove();
+            }
+        }
+
+
+        System.out.println(finalQueue.toString());
+    }
+
+
+    public static class MyQueueItem {
+        String method;
+        int value;
+        int priority;
+
+        public String getMethod() {
+            return method;
+        }
+
+        public void setMethod(String method) {
+            this.method = method;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        public void setValue(int value) {
+            this.value = value;
+        }
+
+        public int getPriority() {
+            return priority;
+        }
+
+        public void setPriority(int priority) {
+            this.priority = priority;
+        }
+
+        @Override
+        public String toString() {
+            return this.getValue() + " " + this.getPriority();
+        }
+    }
+
+
+
+    public static class MyPriorityQueue<MyQueueItem> extends PriorityQueue<MyQueueItem> {
+        int maxCapacity;
+        public MyPriorityQueue() {
+            super();
+        }
+
+        public MyPriorityQueue(int maxCapacity, Comparator comparator) {
+            super(maxCapacity, comparator);
+            this.maxCapacity = maxCapacity;
+        }
+
+        @Override
+        public boolean add(MyQueueItem qi) {
+            boolean val = false;
+            if (this.size() < this.maxCapacity) {
+                val  = super.add(qi);
+            }
+            else {
+                findLowestPriority();
+            }
+
+            return  val;
+        }
+
+        private MyQueueItem findLowestPriority() {
+            MyQueueItem lowestItem = null;
+            Iterator queue = this.iterator();
+            while (queue.hasNext()) {
+                MyQueueItem item = (MyQueueItem)queue.next();
+                System.out.println((MyQueueItem)item.getPriority());
+            }
+
+                return lowestItem;
+        }
+    }
+
+    public static class QueueComparator implements Comparator<MyQueueItem> {
+        public int compare(MyQueueItem q1, MyQueueItem q2) {
+           return Integer.compare(q2.getPriority(), q1.getPriority());
+        }
+    }
+}
