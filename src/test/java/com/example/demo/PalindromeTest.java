@@ -36,4 +36,28 @@ public class PalindromeTest {
 
         assertFalse(palindrome.isPalindrome(x));
     }
+
+    @Test
+    public void test10(){
+        String result = palindrome.generatePalidrome(5,2);
+        assertTrue(palindrome.isPalindrome(result));
+    }
+
+    @Test
+    public void test11() {
+        String result = palindrome.generatePalidrome(4,2);
+        assertTrue(palindrome.isPalindrome(result));
+    }
+
+    @Test
+    public void test12() {
+        String result = palindrome.generatePalidrome(7,3);
+        assertTrue(palindrome.isPalindrome(result));
+    }
+
+    @Test
+    public void test13() {
+        String result = palindrome.generatePalidrome(8,4);
+        assertTrue(palindrome.isPalindrome(result));
+    }
 }
